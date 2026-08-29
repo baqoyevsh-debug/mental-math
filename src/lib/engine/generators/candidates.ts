@@ -1,4 +1,5 @@
 import type { DigitMode, Operation, TargetCategory, Category } from "../core/types";
+import { digitRangeFor } from "../core/bounds";
 import { classifyStep } from "../difficulty/classify";
 
 export interface CandidateStep {
@@ -6,10 +7,6 @@ export interface CandidateStep {
   sign: 1 | -1;
   newTotal: number;
   category: Category;
-}
-
-function digitRange(mode: DigitMode): { min: number; max: number } {
-  return mode === 1 ? { min: 1, max: 9 } : { min: 10, max: 99 };
 }
 
 function shuffle<T>(items: T[], rng: () => number): T[] {
@@ -26,7 +23,7 @@ export function pickFirstNumber(
   excluded: Set<string>,
   rng: () => number,
 ): number | null {
-  const { min, max } = digitRange(digitMode);
+  const { min, max } = digitRangeFor(digitMode);
   const values: number[] = [];
   for (let value = min; value <= max; value++) {
     if (!excluded.has(String(value))) values.push(value);
@@ -46,7 +43,7 @@ export function pickNextStep(
   excluded: Set<string>,
   rng: () => number,
 ): CandidateStep | null {
-  const { min, max } = digitRange(digitMode);
+  const { min, max } = digitRangeFor(digitMode);
   const signs: (1 | -1)[] = operation === "ADD_ONLY" ? [1] : [1, -1];
 
   const pool: { value: number; sign: 1 | -1 }[] = [];

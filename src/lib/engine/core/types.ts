@@ -4,7 +4,7 @@ export type TargetCategory = Category | "ARALASH_HAMMASI";
 
 export type Operation = "ADD_ONLY" | "ADD_SUB";
 
-export type DigitMode = 1 | 2;
+export type DigitMode = 1 | 2 | 3;
 
 export interface Term {
   value: number;

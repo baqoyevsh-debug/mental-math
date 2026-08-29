@@ -1,4 +1,5 @@
 import type { GenerationSettings, GeneratedExample, StepInfo, Term } from "../core/types";
+import { totalMaxFor } from "../core/bounds";
 import { pickFirstNumber, pickNextStep } from "../generators/candidates";
 
 const MAX_BACKTRACKS = 5000;
@@ -7,7 +8,7 @@ export function buildExample(
   settings: GenerationSettings,
   rng: () => number = Math.random,
 ): GeneratedExample {
-  const totalMax = settings.digitMode === 1 ? 99 : 999;
+  const totalMax = totalMaxFor(settings.digitMode);
   const terms: Term[] = [];
   const steps: StepInfo[] = [];
   const excludedAtPosition: Set<string>[] = [];

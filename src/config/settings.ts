@@ -17,6 +17,7 @@ export const COLUMN_COUNT_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as const;
 export const DIGIT_MODE_OPTIONS: { value: DigitMode; label: string }[] = [
   { value: 1, label: "1 xonali (1-9)" },
   { value: 2, label: "2 xonali (10-99)" },
+  { value: 3, label: "3 xonali (100-999)" },
 ];
 
 export const OPERATION_OPTIONS: { value: Operation; label: string }[] = [

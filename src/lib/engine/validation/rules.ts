@@ -1,4 +1,5 @@
 import type { GeneratedExample, GenerationSettings } from "../core/types";
+import { totalMaxFor } from "../core/bounds";
 import { classifyStep } from "../difficulty/classify";
 
 export interface ValidationResult {
@@ -14,7 +15,7 @@ export function validateExample(
   settings: GenerationSettings,
 ): ValidationResult {
   const errors: string[] = [];
-  const totalMax = settings.digitMode === 1 ? 99 : 999;
+  const totalMax = totalMaxFor(settings.digitMode);
   let categoryMismatches = 0;
 
   if (example.terms.length !== settings.columnCount) {

@@ -66,7 +66,7 @@ describe("generator — hech qachon xato tashlamasligi (1 dan 10 gacha ustun)", 
     for (const operation of ["ADD_ONLY", "ADD_SUB"] as Operation[]) {
       it(`columnCount=${columnCount}, operation=${operation}: barcha kategoriyalar uchun ishlaydi`, () => {
         for (const targetCategory of ALL_TARGETS) {
-          for (const digitMode of [1, 2] as const) {
+          for (const digitMode of [1, 2, 3] as const) {
             const settings: GenerationSettings = { targetCategory, columnCount, digitMode, operation };
             expect(() => buildExample(settings)).not.toThrow();
           }
@@ -92,7 +92,7 @@ describe("property-based: javob va oraliq natijalar har doim to'g'ri", () => {
       fc.property(
         fc.constantFrom(...ALL_TARGETS),
         fc.integer({ min: 1, max: 10 }),
-        fc.constantFrom<1 | 2>(1, 2),
+        fc.constantFrom<1 | 2 | 3>(1, 2, 3),
         fc.constantFrom<Operation>("ADD_ONLY", "ADD_SUB"),
         (targetCategory, columnCount, digitMode, operation) => {
           const settings: GenerationSettings = { targetCategory, columnCount, digitMode, operation };
