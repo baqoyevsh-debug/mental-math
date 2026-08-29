@@ -26,6 +26,10 @@ export const OPERATION_OPTIONS: { value: Operation; label: string }[] = [
 
 export const EXAMPLE_COUNT_OPTIONS = [10, 20, 30, 50] as const;
 
+export const SPEED_MIN_MS = 500;
+export const SPEED_MAX_MS = 3000;
+export const SPEED_STEP_MS = 100;
+
 export const DEFAULT_SETTINGS: GenerationSettings = {
   targetCategory: "ODDIY",
   columnCount: 4,
@@ -34,3 +38,4 @@ export const DEFAULT_SETTINGS: GenerationSettings = {
 };
 
 export const DEFAULT_EXAMPLE_COUNT = 20;
+export const DEFAULT_SPEED_MS = 1500;

@@ -19,8 +19,10 @@ export function ChoiceGroup<T extends string | number>({
   onSelect,
 }: ChoiceGroupProps<T>) {
   return (
-    <div className="flex flex-col gap-2">
-      <span className="text-sm font-medium text-muted-foreground">{label}</span>
+    <div className="flex flex-col gap-2.5">
+      <span className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+        {label}
+      </span>
       <div className="flex flex-wrap gap-2">
         {options.map((option) => {
           const active = option.value === value;
@@ -30,10 +32,10 @@ export function ChoiceGroup<T extends string | number>({
               type="button"
               onClick={() => onSelect(option.value)}
               aria-pressed={active}
-              className={`rounded-md border px-4 py-2 text-sm font-medium transition-colors ${
+              className={`rounded-full border px-4 py-2 text-sm font-medium transition-all ${
                 active
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border bg-background text-foreground hover:bg-accent"
+                  ? "border-primary bg-primary text-primary-foreground shadow-sm"
+                  : "border-border bg-background text-foreground hover:border-foreground/30 hover:bg-accent"
               }`}
             >
               {option.label}

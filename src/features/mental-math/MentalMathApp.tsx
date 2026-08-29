@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 import type { GeneratedExample, GenerationSettings } from "@/lib/engine";
-import { CATEGORY_LABELS, DEFAULT_EXAMPLE_COUNT, DEFAULT_SETTINGS } from "@/config/settings";
+import {
+  CATEGORY_LABELS,
+  DEFAULT_EXAMPLE_COUNT,
+  DEFAULT_SETTINGS,
+  DEFAULT_SPEED_MS,
+} from "@/config/settings";
 import { SettingsScreen } from "./SettingsScreen";
 import { PracticeScreen } from "./PracticeScreen";
 import { ResultsScreen } from "./ResultsScreen";
@@ -14,6 +19,7 @@ export function MentalMathApp() {
   const [screen, setScreen] = useState<Screen>("settings");
   const [settings, setSettings] = useState<GenerationSettings>(DEFAULT_SETTINGS);
   const [exampleCount, setExampleCount] = useState(DEFAULT_EXAMPLE_COUNT);
+  const [speedMs, setSpeedMs] = useState(DEFAULT_SPEED_MS);
   const [examples, setExamples] = useState<GeneratedExample[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
@@ -59,6 +65,7 @@ export function MentalMathApp() {
         wrongCount={wrongCount}
         categoryLabel={CATEGORY_LABELS[settings.targetCategory]}
         columnCount={settings.columnCount}
+        speedMs={speedMs}
         onMark={handleMark}
         onNext={handleNext}
       />
@@ -80,9 +87,11 @@ export function MentalMathApp() {
     <SettingsScreen
       settings={settings}
       exampleCount={exampleCount}
+      speedMs={speedMs}
       error={error}
       onChange={setSettings}
       onExampleCountChange={setExampleCount}
+      onSpeedChange={setSpeedMs}
       onStart={startSession}
     />
   );
