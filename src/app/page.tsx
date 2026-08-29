@@ -1,7 +1,5 @@
+import { MentalMathApp } from "@/features/mental-math/MentalMathApp";
+
 export default function Home() {
-  return (
-    <main className="flex min-h-screen items-center justify-center">
-      <h1>Mental Math UZ</h1>
-    </main>
-  );
+  return <MentalMathApp />;
 }
