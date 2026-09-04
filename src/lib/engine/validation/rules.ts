@@ -15,7 +15,7 @@ export function validateExample(
   settings: GenerationSettings,
 ): ValidationResult {
   const errors: string[] = [];
-  const totalMax = totalMaxFor(settings.digitMode);
+  const totalMax = totalMaxFor(settings.digitMode, settings.targetCategory === "ODDIY");
   let categoryMismatches = 0;
 
   if (example.terms.length !== settings.columnCount) {

@@ -8,7 +8,7 @@ export function buildExample(
   settings: GenerationSettings,
   rng: () => number = Math.random,
 ): GeneratedExample {
-  const totalMax = totalMaxFor(settings.digitMode);
+  const totalMax = totalMaxFor(settings.digitMode, settings.targetCategory === "ODDIY");
   const terms: Term[] = [];
   const steps: StepInfo[] = [];
   const excludedAtPosition: Set<string>[] = [];

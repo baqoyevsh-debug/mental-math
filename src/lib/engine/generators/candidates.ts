@@ -72,13 +72,20 @@ export function pickNextStep(
     return null;
   }
 
-  // Amaliyotdagi o'qituvchilar bilan tekshirilgach ma'lum bo'ldiki, misoldagi
-  // HAR BIR qadam qat'iy ravishda tanlangan kategoriyaga mos kelishi shart
-  // emas — kategoriya faqat afzal qilingan texnika, majburiy talab emas.
-  // Shu bois avval mos kategoriya + takrorsiz, keyin mos kategoriya +
-  // takror bilan, so'ng (agar chindan ham imkonsiz bo'lsa) kategoriyasiz
-  // variant qidiriladi — bu istalgan ustun soni (hatto 10 tagacha) uchun
-  // ham misol generatsiya qilinishini kafolatlaydi.
+  // "Oddiy" — bolalar hali hech qanday formula (kichik/katta do'st texnikasi)
+  // bilmaydigan eng boshlang'ich bosqich, shuning uchun bu yerda kategoriya
+  // qat'iy talab: formula talab qiladigan qadam HECH QACHON sizib chiqmasligi
+  // kerak (mos qadam topilmasa, misolning o'zi qaytadan quriladi).
+  //
+  // Boshqa kategoriyalarda (Kichik/Katta/Aralash do'st) esa amaliyotdagi
+  // o'qituvchilar bilan tekshirilgach ma'lum bo'ldiki, HAR BIR qadam qat'iy
+  // mos kelishi shart emas — shu bois ular uchun kategoriyasiz variantga ham
+  // (oxirgi chora sifatida) tushish mumkin, bu istalgan ustun soni uchun ham
+  // misol generatsiya qilinishini kafolatlaydi.
+  if (target === "ODDIY") {
+    return findMatch(false, true) ?? findMatch(true, true);
+  }
+
   return (
     findMatch(false, true) ??
     findMatch(true, true) ??

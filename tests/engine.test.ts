@@ -29,10 +29,11 @@ function baseSettings(target: TargetCategory): GenerationSettings {
 }
 
 describe("generator — har bir kategoriya uchun 200 ta misol", () => {
-  // Kategoriya afzallik hisoblanadi, qat'iy talab emas (amaliyotdagi
-  // o'qituvchi bilan tekshirilgan) — shuning uchun bu yerda faqat javob
-  // to'g'riligi va oraliq natijalar chegarasi qat'iy tekshiriladi, kategoriya
-  // mosligi esa informatsion (categoryMismatches) sifatida kuzatiladi.
+  // "Oddiy" — bolalar hali formula bilmaydigan boshlang'ich bosqich, shuning
+  // uchun bu yerda kategoriya QAT'IY talab: bironta ham mosliksiz qadam
+  // bo'lmasligi kerak. Boshqa kategoriyalarda (amaliyotdagi o'qituvchi bilan
+  // tekshirilgan) qat'iy talab emas, shuning uchun mosliksiz qadamlar
+  // informatsion (categoryMismatches) sifatida kuzatiladi.
   for (const target of ALL_TARGETS) {
     it(`${target}: javob to'g'ri, oraliq natijalar chegarada`, () => {
       const settings = baseSettings(target);
@@ -49,12 +50,12 @@ describe("generator — har bir kategoriya uchun 200 ta misol", () => {
         totalSteps += example.steps.length;
       }
 
-      // Tanlangan kategoriyaga mos qadam topilganda u afzal qilinadi (tiyer
-      // 1-2 avval sinaladi), shuning uchun mosliksiz qadamlar ko'pchilikni
-      // tashkil qilmasligi kerak — lekin ARALASH_DUST kabi tabiatan kamdan-kam
-      // uchraydigan kategoriyalarda ular sezilarli ulushni tashkil qilishi
-      // mumkin (bu — kutilgan holat, xato emas).
-      if (target !== "ARALASH_HAMMASI" && totalSteps > 0) {
+      if (target === "ODDIY") {
+        expect(totalMismatches).toBe(0);
+      } else if (target !== "ARALASH_HAMMASI" && totalSteps > 0) {
+        // ARALASH_DUST kabi tabiatan kamdan-kam uchraydigan kategoriyalarda
+        // mosliksiz qadamlar sezilarli ulushni tashkil qilishi mumkin (bu —
+        // kutilgan holat, xato emas).
         expect(totalMismatches / totalSteps).toBeLessThan(0.6);
       }
     });
@@ -62,10 +63,16 @@ describe("generator — har bir kategoriya uchun 200 ta misol", () => {
 });
 
 describe("generator — hech qachon xato tashlamasligi (1 dan 10 gacha ustun)", () => {
+  // "Oddiy" endi qat'iy (formulasiz) bo'lgani va javob tanlangan xonalar
+  // sonidan chiqmasligi kerakligi sababli, ba'zi tor kombinatsiyalarda
+  // (masalan, 1 xonali + Faqat qo'shish + ko'p ustun) misol matematik
+  // jihatdan mumkin emas — bu holatda generator aniq xato tashlaydi va UI
+  // o'qituvchiga ustun sonini kamaytirishni yoki ayirishni yoqishni taklif
+  // qiladi. Shu bois "Oddiy" bu testda alohida (yumshoqroq) tekshiriladi.
   for (const columnCount of [1, 2, 3, 5, 8, 10]) {
     for (const operation of ["ADD_ONLY", "ADD_SUB"] as Operation[]) {
-      it(`columnCount=${columnCount}, operation=${operation}: barcha kategoriyalar uchun ishlaydi`, () => {
-        for (const targetCategory of ALL_TARGETS) {
+      it(`columnCount=${columnCount}, operation=${operation}: Oddiydan boshqa barcha kategoriyalar uchun ishlaydi`, () => {
+        for (const targetCategory of CATEGORIES.filter((c) => c !== "ODDIY")) {
           for (const digitMode of [1, 2, 3] as const) {
             const settings: GenerationSettings = { targetCategory, columnCount, digitMode, operation };
             expect(() => buildExample(settings)).not.toThrow();
@@ -74,6 +81,20 @@ describe("generator — hech qachon xato tashlamasligi (1 dan 10 gacha ustun)", 
       });
     }
   }
+
+  it("Oddiy: kamida ADD_SUB bilan istalgan ustun sonida ishlaydi", () => {
+    for (const columnCount of [1, 2, 3, 5, 8, 10]) {
+      for (const digitMode of [1, 2, 3] as const) {
+        const settings: GenerationSettings = {
+          targetCategory: "ODDIY",
+          columnCount,
+          digitMode,
+          operation: "ADD_SUB",
+        };
+        expect(() => buildExample(settings)).not.toThrow();
+      }
+    }
+  });
 });
 
 describe("columnCount=1 — chegara holati", () => {
@@ -96,7 +117,19 @@ describe("property-based: javob va oraliq natijalar har doim to'g'ri", () => {
         fc.constantFrom<Operation>("ADD_ONLY", "ADD_SUB"),
         (targetCategory, columnCount, digitMode, operation) => {
           const settings: GenerationSettings = { targetCategory, columnCount, digitMode, operation };
-          const example = buildExample(settings);
+
+          let example;
+          try {
+            example = buildExample(settings);
+          } catch (err) {
+            // "Oddiy" qat'iy (formulasiz) va javob xonalar sonidan chiqmasligi
+            // kerakligi sababli ba'zi tor kombinatsiyalarda matematik
+            // jihatdan yechim yo'q bo'lishi mumkin — bu domenning haqiqiy
+            // chegarasi, bug emas (UI bunday holatda o'qituvchiga aniq
+            // ko'rsatma beradi).
+            if (targetCategory === "ODDIY") return;
+            throw err;
+          }
 
           const sum = example.terms.reduce((acc, term) => acc + term.sign * term.value, 0);
           expect(sum).toBe(example.answer);
