@@ -113,8 +113,11 @@ export function abacusProblemsToExamples(problems: RawProblem[]): AbacusExample[
   return problems.map(toAbacusExample);
 }
 
-export function getMulDivPool(operation: MulDivOperation): RawMulDivPair[] {
-  return operation === "MULTIPLY" ? MULTIPLY_DATA : DIVIDE_DATA;
+export function getMulDivPool(operations: readonly MulDivOperation[]): RawMulDivPair[] {
+  const pools: RawMulDivPair[] = [];
+  if (operations.includes("MULTIPLY")) pools.push(...MULTIPLY_DATA);
+  if (operations.includes("DIVIDE")) pools.push(...DIVIDE_DATA);
+  return pools;
 }
 
 export function mulDivPairToExample(pair: RawMulDivPair): MulDivExample {

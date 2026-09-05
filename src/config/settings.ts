@@ -41,7 +41,7 @@ export const DEFAULT_SETTINGS: GenerationSettings = {
   columnCount: 4,
   digitMode: 1,
   operation: "ADD_SUB",
-  mulDivOperation: "MULTIPLY",
+  mulDivOperations: ["MULTIPLY"],
 };
 
 export const DEFAULT_EXAMPLE_COUNT = 20;

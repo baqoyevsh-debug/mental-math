@@ -50,6 +50,7 @@ export interface GenerationSettings {
   digitMode: DigitMode;
   /** ODDIY/KICHIK_DUST/KATTA_DUST/MIKS uchun. */
   operation: Operation;
-  /** Faqat KOPAYTIRISH_BOLISH uchun. */
-  mulDivOperation: MulDivOperation;
+  /** Faqat KOPAYTIRISH_BOLISH uchun — ikkalasini ham tanlash mumkin (bo'sh
+   * bo'lmasligi kerak). */
+  mulDivOperations: MulDivOperation[];
 }

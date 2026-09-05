@@ -19,6 +19,7 @@ import {
   OPERATION_OPTIONS,
 } from "@/config/settings";
 import { ChoiceGroup } from "./ChoiceGroup";
+import { MultiChoiceGroup } from "./MultiChoiceGroup";
 import { SpeedSlider } from "./SpeedSlider";
 
 interface SettingsScreenProps {
@@ -139,11 +140,18 @@ export function SettingsScreen({
           )}
 
           {isMulDiv && (
-            <ChoiceGroup
+            <MultiChoiceGroup
               label="Amal"
               options={MUL_DIV_OPERATION_OPTIONS}
-              value={settings.mulDivOperation}
-              onSelect={(mulDivOperation: MulDivOperation) => onChange({ ...settings, mulDivOperation })}
+              values={settings.mulDivOperations}
+              onToggle={(op: MulDivOperation) =>
+                onChange({
+                  ...settings,
+                  mulDivOperations: settings.mulDivOperations.includes(op)
+                    ? settings.mulDivOperations.filter((existing) => existing !== op)
+                    : [...settings.mulDivOperations, op],
+                })
+              }
             />
           )}
 

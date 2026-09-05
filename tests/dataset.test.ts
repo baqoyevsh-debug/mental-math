@@ -99,7 +99,7 @@ describe("buildDatasetSession — abakus kategoriyalari", () => {
         columnCount: 6,
         digitMode: 1,
         operation: "ADD_SUB",
-        mulDivOperation: "MULTIPLY",
+        mulDivOperations: ["MULTIPLY"],
       };
       const pool = countAbacusPool(targetCategory, 1, 6, "ADD_SUB");
       if (pool === 0) return; // bu aniq kombinatsiya mavjud bo'lmasa, o'tkazib yuboriladi
@@ -123,7 +123,7 @@ describe("buildDatasetSession — abakus kategoriyalari", () => {
       columnCount: 4,
       digitMode: 3,
       operation: "ADD_SUB",
-      mulDivOperation: "MULTIPLY",
+      mulDivOperations: ["MULTIPLY"],
     };
     expect(countAbacusPool("KICHIK_DUST", 3, 4, "ADD_SUB")).toBe(0);
     expect(() => buildDatasetSession(settings, 10)).toThrow();
@@ -137,7 +137,7 @@ describe("buildDatasetSession — Ko'paytirish va bo'lish", () => {
       columnCount: 2,
       digitMode: 1,
       operation: "ADD_SUB",
-      mulDivOperation: "MULTIPLY",
+      mulDivOperations: ["MULTIPLY"],
     };
     const session = buildDatasetSession(settings, 10);
     expect(session).toHaveLength(10);
@@ -154,7 +154,7 @@ describe("buildDatasetSession — Ko'paytirish va bo'lish", () => {
       columnCount: 2,
       digitMode: 1,
       operation: "ADD_SUB",
-      mulDivOperation: "DIVIDE",
+      mulDivOperations: ["DIVIDE"],
     };
     const session = buildDatasetSession(settings, 10);
     expect(session).toHaveLength(10);
@@ -165,6 +165,21 @@ describe("buildDatasetSession — Ko'paytirish va bo'lish", () => {
       expect(example.answer * example.b + remainder).toBe(example.a);
       expect(remainder).toBeLessThan(example.b);
     }
+  });
+
+  it("Ko'paytirish + Bo'lish birga tanlansa, ikkalasi ham aralashib chiqadi", () => {
+    const settings: GenerationSettings = {
+      targetCategory: "KOPAYTIRISH_BOLISH",
+      columnCount: 2,
+      digitMode: 1,
+      operation: "ADD_SUB",
+      mulDivOperations: ["MULTIPLY", "DIVIDE"],
+    };
+    const session = buildDatasetSession(settings, 50);
+    expect(session).toHaveLength(50);
+    const operationsSeen = new Set(session.map((example) => (example.kind === "muldiv" ? example.operation : null)));
+    expect(operationsSeen.has("MULTIPLY")).toBe(true);
+    expect(operationsSeen.has("DIVIDE")).toBe(true);
   });
 });
 

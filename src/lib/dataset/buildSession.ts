@@ -53,8 +53,9 @@ function pickUnique<T>(pool: T[], count: number, fingerprint: (item: T) => strin
 
 export function buildDatasetSession(settings: GenerationSettings, count: number): GeneratedExample[] {
   if (settings.targetCategory === "KOPAYTIRISH_BOLISH") {
-    const history = openCategoryHistory(`KOPAYTIRISH_BOLISH:${settings.mulDivOperation}`);
-    const pool = getMulDivPool(settings.mulDivOperation);
+    const opsKey = [...settings.mulDivOperations].sort().join(",");
+    const history = openCategoryHistory(`KOPAYTIRISH_BOLISH:${opsKey}`);
+    const pool = getMulDivPool(settings.mulDivOperations);
     const picked = pickUnique(pool, count, fingerprintMulDivPair, history);
     history.flush();
     return picked.map(mulDivPairToExample);
