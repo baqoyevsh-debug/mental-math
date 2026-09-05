@@ -1,6 +1,7 @@
 "use client";
 
-import type { DigitMode, GenerationSettings, Operation } from "@/lib/engine";
+import { useEffect, useMemo } from "react";
+import { getViableColumnCounts, type DigitMode, type GenerationSettings, type Operation } from "@/lib/engine";
 import {
   CATEGORY_OPTIONS,
   COLUMN_COUNT_OPTIONS,
@@ -32,6 +33,34 @@ export function SettingsScreen({
   onSpeedChange,
   onStart,
 }: SettingsScreenProps) {
+  const viableColumnCounts = useMemo(
+    () =>
+      getViableColumnCounts(
+        {
+          targetCategory: settings.targetCategory,
+          digitMode: settings.digitMode,
+          operation: settings.operation,
+        },
+        COLUMN_COUNT_OPTIONS,
+      ),
+    [settings.targetCategory, settings.digitMode, settings.operation],
+  );
+
+  // Kategoriya/sonlar/amal o'zgarganda joriy ustun soni endi ma'noli
+  // bo'lmasa (masalan, "Oddiy + Faqat qo'shish" bir xil javobga qulflanib
+  // qolsa), eng yaqin yaroqli qiymatga avtomatik o'tkaziladi.
+  useEffect(() => {
+    if (viableColumnCounts.has(settings.columnCount)) return;
+
+    const fallback =
+      [...viableColumnCounts].filter((n) => n <= settings.columnCount).sort((a, b) => b - a)[0] ??
+      [...viableColumnCounts].sort((a, b) => a - b)[0];
+
+    if (fallback !== undefined && fallback !== settings.columnCount) {
+      onChange({ ...settings, columnCount: fallback });
+    }
+  }, [viableColumnCounts, settings, onChange]);
+
   return (
     <div className="min-h-screen bg-muted/40">
       <div className="mx-auto flex max-w-2xl flex-col gap-8 px-4 py-10 sm:py-16">
@@ -60,6 +89,7 @@ export function SettingsScreen({
             options={COLUMN_COUNT_OPTIONS.map((n) => ({ value: n, label: String(n) }))}
             value={settings.columnCount}
             onSelect={(columnCount) => onChange({ ...settings, columnCount })}
+            isDisabled={(n) => !viableColumnCounts.has(n)}
           />
 
           <ChoiceGroup

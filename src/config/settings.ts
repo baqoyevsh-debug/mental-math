@@ -33,7 +33,7 @@ export const SPEED_STEP_MS = 100;
 
 export const DEFAULT_SETTINGS: GenerationSettings = {
   targetCategory: "ODDIY",
-  columnCount: 4,
+  columnCount: 2,
   digitMode: 1,
   operation: "ADD_ONLY",
 };
