@@ -23,27 +23,28 @@ export function MultiChoiceGroup<T extends string>({
       <span className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
         {label}
       </span>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-3">
         {options.map((option) => {
           const active = values.includes(option.value);
           // Bo'sh holatga tushmasligi uchun oxirgi tanlangan variantni
           // o'chirib bo'lmaydi.
           const isOnlySelected = active && values.length === 1;
           return (
-            <button
+            <label
               key={option.value}
-              type="button"
-              disabled={isOnlySelected}
-              onClick={() => onToggle(option.value)}
-              aria-pressed={active}
-              className={`rounded-full border px-4 py-2 text-sm font-medium transition-all ${
-                active
-                  ? "border-primary bg-primary text-primary-foreground shadow-sm"
-                  : "border-border bg-background text-foreground hover:border-foreground/30 hover:bg-accent"
-              } ${isOnlySelected ? "cursor-not-allowed opacity-90" : ""}`}
+              className={`flex items-center gap-2.5 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all ${
+                active ? "border-primary bg-primary/5" : "border-border bg-background hover:bg-accent"
+              } ${isOnlySelected ? "cursor-not-allowed opacity-90" : "cursor-pointer"}`}
             >
+              <input
+                type="checkbox"
+                checked={active}
+                disabled={isOnlySelected}
+                onChange={() => onToggle(option.value)}
+                className="h-4 w-4 accent-primary"
+              />
               {option.label}
-            </button>
+            </label>
           );
         })}
       </div>
