@@ -1,4 +1,8 @@
-import type { DigitMode, GenerationSettings, MulDivOperation, Operation, TargetCategory } from "@/lib/dataset";
+import type { DigitMode, GenerationSettings, Operation, TargetCategory } from "@/lib/dataset";
+
+/** Sozlamalar ekranidagi "Amal" tanlovi — bitta variant tanlanadi, lekin
+ * "Ko'paytirish va bo'lish" ikkalasini ham birlashtiradi. */
+export type MulDivSelection = "MULTIPLY" | "DIVIDE" | "BOTH";
 
 export const CATEGORY_OPTIONS: { value: TargetCategory; label: string }[] = [
   { value: "ODDIY", label: "Oddiy" },
@@ -25,9 +29,10 @@ export const OPERATION_OPTIONS: { value: Operation; label: string }[] = [
   { value: "ADD_SUB", label: "Qo'shish va ayirish" },
 ];
 
-export const MUL_DIV_OPERATION_OPTIONS: { value: MulDivOperation; label: string }[] = [
+export const MUL_DIV_OPERATION_OPTIONS: { value: MulDivSelection; label: string }[] = [
   { value: "MULTIPLY", label: "Ko'paytirish" },
   { value: "DIVIDE", label: "Bo'lish" },
+  { value: "BOTH", label: "Ko'paytirish va bo'lish" },
 ];
 
 export const EXAMPLE_COUNT_OPTIONS = [10, 20, 30, 50] as const;

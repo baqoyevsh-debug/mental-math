@@ -7,7 +7,6 @@ import {
   type AbacusCategory,
   type DigitMode,
   type GenerationSettings,
-  type MulDivOperation,
   type Operation,
 } from "@/lib/dataset";
 import {
@@ -17,9 +16,9 @@ import {
   EXAMPLE_COUNT_OPTIONS,
   MUL_DIV_OPERATION_OPTIONS,
   OPERATION_OPTIONS,
+  type MulDivSelection,
 } from "@/config/settings";
 import { ChoiceGroup } from "./ChoiceGroup";
-import { MultiChoiceGroup } from "./MultiChoiceGroup";
 import { SpeedSlider } from "./SpeedSlider";
 
 interface SettingsScreenProps {
@@ -140,16 +139,14 @@ export function SettingsScreen({
           )}
 
           {isMulDiv && (
-            <MultiChoiceGroup
+            <ChoiceGroup
               label="Amal"
               options={MUL_DIV_OPERATION_OPTIONS}
-              values={settings.mulDivOperations}
-              onToggle={(op: MulDivOperation) =>
+              value={settings.mulDivOperations.length === 2 ? "BOTH" : settings.mulDivOperations[0]}
+              onSelect={(selection: MulDivSelection) =>
                 onChange({
                   ...settings,
-                  mulDivOperations: settings.mulDivOperations.includes(op)
-                    ? settings.mulDivOperations.filter((existing) => existing !== op)
-                    : [...settings.mulDivOperations, op],
+                  mulDivOperations: selection === "BOTH" ? ["MULTIPLY", "DIVIDE"] : [selection],
                 })
               }
             />
