@@ -1,11 +1,11 @@
-import type { DigitMode, GenerationSettings, Operation, TargetCategory } from "@/lib/engine";
+import type { DigitMode, GenerationSettings, MulDivOperation, Operation, TargetCategory } from "@/lib/dataset";
 
 export const CATEGORY_OPTIONS: { value: TargetCategory; label: string }[] = [
   { value: "ODDIY", label: "Oddiy" },
   { value: "KICHIK_DUST", label: "Kichik do'st" },
   { value: "KATTA_DUST", label: "Katta do'st" },
-  { value: "ARALASH_DUST", label: "Aralash do'st" },
-  { value: "ARALASH_HAMMASI", label: "Aralash (hammasi)" },
+  { value: "MIKS", label: "Miks" },
+  { value: "KOPAYTIRISH_BOLISH", label: "Ko'paytirish, bo'lish" },
 ];
 
 export const CATEGORY_LABELS: Record<TargetCategory, string> = Object.fromEntries(
@@ -25,6 +25,11 @@ export const OPERATION_OPTIONS: { value: Operation; label: string }[] = [
   { value: "ADD_SUB", label: "Qo'shish va ayirish" },
 ];
 
+export const MUL_DIV_OPERATION_OPTIONS: { value: MulDivOperation; label: string }[] = [
+  { value: "MULTIPLY", label: "Ko'paytirish" },
+  { value: "DIVIDE", label: "Bo'lish" },
+];
+
 export const EXAMPLE_COUNT_OPTIONS = [10, 20, 30, 50] as const;
 
 export const SPEED_MIN_MS = 500;
@@ -33,9 +38,10 @@ export const SPEED_STEP_MS = 100;
 
 export const DEFAULT_SETTINGS: GenerationSettings = {
   targetCategory: "ODDIY",
-  columnCount: 2,
+  columnCount: 4,
   digitMode: 1,
-  operation: "ADD_ONLY",
+  operation: "ADD_SUB",
+  mulDivOperation: "MULTIPLY",
 };
 
 export const DEFAULT_EXAMPLE_COUNT = 20;

@@ -1,12 +1,21 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import { getViableColumnCounts, type DigitMode, type GenerationSettings, type Operation } from "@/lib/engine";
+import {
+  getViableColumnCounts,
+  hasAnyAbacusData,
+  type AbacusCategory,
+  type DigitMode,
+  type GenerationSettings,
+  type MulDivOperation,
+  type Operation,
+} from "@/lib/dataset";
 import {
   CATEGORY_OPTIONS,
   COLUMN_COUNT_OPTIONS,
   DIGIT_MODE_OPTIONS,
   EXAMPLE_COUNT_OPTIONS,
+  MUL_DIV_OPERATION_OPTIONS,
   OPERATION_OPTIONS,
 } from "@/config/settings";
 import { ChoiceGroup } from "./ChoiceGroup";
@@ -33,23 +42,31 @@ export function SettingsScreen({
   onSpeedChange,
   onStart,
 }: SettingsScreenProps) {
+  const isMulDiv = settings.targetCategory === "KOPAYTIRISH_BOLISH";
+  const category = settings.targetCategory as AbacusCategory;
+
   const viableColumnCounts = useMemo(
-    () =>
-      getViableColumnCounts(
-        {
-          targetCategory: settings.targetCategory,
-          digitMode: settings.digitMode,
-          operation: settings.operation,
-        },
-        COLUMN_COUNT_OPTIONS,
-      ),
-    [settings.targetCategory, settings.digitMode, settings.operation],
+    () => (isMulDiv ? new Set<number>() : getViableColumnCounts(category, settings.digitMode, settings.operation, COLUMN_COUNT_OPTIONS)),
+    [isMulDiv, category, settings.digitMode, settings.operation],
   );
 
-  // Kategoriya/sonlar/amal o'zgarganda joriy ustun soni endi ma'noli
-  // bo'lmasa (masalan, "Oddiy + Faqat qo'shish" bir xil javobga qulflanib
-  // qolsa), eng yaqin yaroqli qiymatga avtomatik o'tkaziladi.
+  const viableDigitModes = useMemo(
+    () =>
+      isMulDiv
+        ? new Set<DigitMode>()
+        : new Set(
+            DIGIT_MODE_OPTIONS.map((o) => o.value).filter((digitMode) =>
+              hasAnyAbacusData(category, digitMode, settings.operation, COLUMN_COUNT_OPTIONS),
+            ),
+          ),
+    [isMulDiv, category, settings.operation],
+  );
+
+  // Kategoriya/sonlar/amal o'zgarganda joriy ustun soni endi mos kelmasa
+  // (masalan, shu kombinatsiyada namunadan olingan misollar yetarli
+  // bo'lmasa), eng yaqin yaroqli qiymatga avtomatik o'tkaziladi.
   useEffect(() => {
+    if (isMulDiv) return;
     if (viableColumnCounts.has(settings.columnCount)) return;
 
     const fallback =
@@ -59,7 +76,17 @@ export function SettingsScreen({
     if (fallback !== undefined && fallback !== settings.columnCount) {
       onChange({ ...settings, columnCount: fallback });
     }
-  }, [viableColumnCounts, settings, onChange]);
+  }, [isMulDiv, viableColumnCounts, settings, onChange]);
+
+  useEffect(() => {
+    if (isMulDiv) return;
+    if (viableDigitModes.has(settings.digitMode)) return;
+
+    const fallback = [...viableDigitModes].sort((a, b) => a - b)[0];
+    if (fallback !== undefined && fallback !== settings.digitMode) {
+      onChange({ ...settings, digitMode: fallback });
+    }
+  }, [isMulDiv, viableDigitModes, settings, onChange]);
 
   return (
     <div className="min-h-screen bg-muted/40">
@@ -84,27 +111,41 @@ export function SettingsScreen({
 
           <SpeedSlider valueMs={speedMs} onChange={onSpeedChange} />
 
-          <ChoiceGroup
-            label="Ustun soni"
-            options={COLUMN_COUNT_OPTIONS.map((n) => ({ value: n, label: String(n) }))}
-            value={settings.columnCount}
-            onSelect={(columnCount) => onChange({ ...settings, columnCount })}
-            isDisabled={(n) => !viableColumnCounts.has(n)}
-          />
+          {!isMulDiv && (
+            <>
+              <ChoiceGroup
+                label="Ustun soni"
+                options={COLUMN_COUNT_OPTIONS.map((n) => ({ value: n, label: String(n) }))}
+                value={settings.columnCount}
+                onSelect={(columnCount) => onChange({ ...settings, columnCount })}
+                isDisabled={(n) => !viableColumnCounts.has(n)}
+              />
 
-          <ChoiceGroup
-            label="Sonlar"
-            options={DIGIT_MODE_OPTIONS}
-            value={settings.digitMode}
-            onSelect={(digitMode: DigitMode) => onChange({ ...settings, digitMode })}
-          />
+              <ChoiceGroup
+                label="Sonlar"
+                options={DIGIT_MODE_OPTIONS}
+                value={settings.digitMode}
+                onSelect={(digitMode: DigitMode) => onChange({ ...settings, digitMode })}
+                isDisabled={(n) => !viableDigitModes.has(n)}
+              />
 
-          <ChoiceGroup
-            label="Amal"
-            options={OPERATION_OPTIONS}
-            value={settings.operation}
-            onSelect={(operation: Operation) => onChange({ ...settings, operation })}
-          />
+              <ChoiceGroup
+                label="Amal"
+                options={OPERATION_OPTIONS}
+                value={settings.operation}
+                onSelect={(operation: Operation) => onChange({ ...settings, operation })}
+              />
+            </>
+          )}
+
+          {isMulDiv && (
+            <ChoiceGroup
+              label="Amal"
+              options={MUL_DIV_OPERATION_OPTIONS}
+              value={settings.mulDivOperation}
+              onSelect={(mulDivOperation: MulDivOperation) => onChange({ ...settings, mulDivOperation })}
+            />
+          )}
 
           <ChoiceGroup
             label="Misollar soni"

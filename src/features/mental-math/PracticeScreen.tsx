@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { GeneratedExample } from "@/lib/engine";
+import type { GeneratedExample } from "@/lib/dataset";
 
 interface PracticeScreenProps {
   examples: GeneratedExample[];
@@ -17,6 +17,31 @@ interface PracticeScreenProps {
 
 type Phase = "flashing" | "ready" | "answer";
 
+interface FlashItem {
+  value: number;
+  prefix: string;
+}
+
+function getFlashItems(example: GeneratedExample): FlashItem[] {
+  if (example.kind === "abacus") {
+    return example.terms.map((term, index) => ({
+      value: term.value,
+      prefix: index === 0 ? "" : term.sign === 1 ? "+" : "−",
+    }));
+  }
+  return [
+    { value: example.a, prefix: "" },
+    { value: example.b, prefix: example.operation === "MULTIPLY" ? "×" : "÷" },
+  ];
+}
+
+function getAnswerDisplay(example: GeneratedExample): { main: string; sub?: string } {
+  if (example.kind === "abacus" || example.remainder === undefined) {
+    return { main: String(example.answer) };
+  }
+  return { main: String(example.answer), sub: `qoldiq ${example.remainder}` };
+}
+
 export function PracticeScreen({
   examples,
   currentIndex,
@@ -29,6 +54,10 @@ export function PracticeScreen({
   onNext,
 }: PracticeScreenProps) {
   const example = examples[currentIndex];
+  const flashItems = getFlashItems(example);
+  const answerDisplay = getAnswerDisplay(example);
+  const isAbacus = example.kind === "abacus";
+
   const [phase, setPhase] = useState<Phase>("flashing");
   const [revealIndex, setRevealIndex] = useState(0);
 
@@ -41,7 +70,7 @@ export function PracticeScreen({
     if (phase !== "flashing") return;
 
     const timer = setTimeout(() => {
-      if (revealIndex + 1 < example.terms.length) {
+      if (revealIndex + 1 < flashItems.length) {
         setRevealIndex((index) => index + 1);
       } else {
         setPhase("ready");
@@ -49,7 +78,7 @@ export function PracticeScreen({
     }, speedMs);
 
     return () => clearTimeout(timer);
-  }, [phase, revealIndex, example.terms.length, speedMs]);
+  }, [phase, revealIndex, flashItems.length, speedMs]);
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -78,8 +107,8 @@ export function PracticeScreen({
   return (
     <div className="flex min-h-screen flex-col items-center bg-background p-4">
       <div className="w-full max-w-3xl py-3 text-center text-sm text-muted-foreground">
-        <span className="font-medium text-foreground">{categoryLabel}</span> · {columnCount} ustun
-        · Misol {currentIndex + 1}/{examples.length} ·{" "}
+        <span className="font-medium text-foreground">{categoryLabel}</span>
+        {isAbacus && <> · {columnCount} ustun</>} · Misol {currentIndex + 1}/{examples.length} ·{" "}
         <span className="text-primary">✓{correctCount}</span>{" "}
         <span className="text-red-600">✗{wrongCount}</span>
       </div>
@@ -89,9 +118,9 @@ export function PracticeScreen({
           <FlashingTerm
             key={`${currentIndex}-${revealIndex}`}
             index={revealIndex}
-            total={example.terms.length}
-            value={example.terms[revealIndex].value}
-            sign={example.terms[revealIndex].sign}
+            total={flashItems.length}
+            value={flashItems[revealIndex].value}
+            prefix={flashItems[revealIndex].prefix}
           />
         )}
 
@@ -106,19 +135,24 @@ export function PracticeScreen({
         )}
 
         {phase === "answer" && (
-          <span
-            className="animate-in zoom-in-95 fade-in font-mono font-bold tabular-nums text-primary duration-200"
-            style={{ fontSize: "clamp(5rem, 32vh, 18rem)", lineHeight: 1 }}
-          >
-            {example.answer}
-          </span>
+          <div className="animate-in zoom-in-95 fade-in flex flex-col items-center gap-2 duration-200">
+            <span
+              className="font-mono font-bold tabular-nums text-primary"
+              style={{ fontSize: "clamp(5rem, 32vh, 18rem)", lineHeight: 1 }}
+            >
+              {answerDisplay.main}
+            </span>
+            {answerDisplay.sub && (
+              <span className="text-2xl font-medium text-muted-foreground">{answerDisplay.sub}</span>
+            )}
+          </div>
         )}
       </div>
 
       <div className="flex w-full max-w-md flex-col gap-4 pb-10">
         {phase === "flashing" && (
           <div className="flex justify-center gap-1.5">
-            {example.terms.map((_, index) => (
+            {flashItems.map((_, index) => (
               <span
                 key={index}
                 className={`h-1.5 w-6 rounded-full transition-colors ${
@@ -156,12 +190,12 @@ function FlashingTerm({
   index,
   total,
   value,
-  sign,
+  prefix,
 }: {
   index: number;
   total: number;
   value: number;
-  sign: 1 | -1;
+  prefix: string;
 }) {
   return (
     <div className="flex flex-col items-center gap-6">
@@ -172,7 +206,7 @@ function FlashingTerm({
         className="animate-in zoom-in-95 fade-in font-mono font-bold tabular-nums text-foreground duration-200"
         style={{ fontSize: "clamp(5rem, 32vh, 18rem)", lineHeight: 1 }}
       >
-        {index === 0 ? "" : sign === 1 ? "+" : "−"}
+        {prefix}
         {value}
       </span>
     </div>

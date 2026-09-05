@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import type { GeneratedExample, GenerationSettings } from "@/lib/engine";
+import type { GeneratedExample, GenerationSettings } from "@/lib/dataset";
+import { buildDatasetSession } from "@/lib/dataset";
 import {
   CATEGORY_LABELS,
   DEFAULT_EXAMPLE_COUNT,
@@ -11,7 +12,6 @@ import {
 import { SettingsScreen } from "./SettingsScreen";
 import { PracticeScreen } from "./PracticeScreen";
 import { ResultsScreen } from "./ResultsScreen";
-import { buildUniqueSession } from "./buildUniqueSession";
 
 type Screen = "settings" | "practice" | "results";
 
@@ -28,7 +28,7 @@ export function MentalMathApp() {
 
   function startSession() {
     try {
-      const session = buildUniqueSession(settings, exampleCount);
+      const session = buildDatasetSession(settings, exampleCount);
       setExamples(session);
       setCurrentIndex(0);
       setCorrectCount(0);
@@ -37,7 +37,7 @@ export function MentalMathApp() {
       setScreen("practice");
     } catch {
       setError(
-        "Bu sozlamalar bilan misol yaratib bo'lmadi. Ustun sonini kamaytiring yoki \"Qo'shish va ayirish\"ni tanlang.",
+        "Bu sozlamalar bilan misol topilmadi. Boshqa ustun soni, sonlar yoki amal tanlang.",
       );
     }
   }

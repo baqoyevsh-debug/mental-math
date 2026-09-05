@@ -1,4 +1,4 @@
-import type { Category } from "../core/types";
+import type { Category } from "./types";
 
 function classifyAdditionDigit(c: number, d: number): Category {
   const lower = c % 5;
